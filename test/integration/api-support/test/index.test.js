@@ -248,6 +248,20 @@ function runTests(dev = false) {
     expect(unmodifiedResponse.status).toBe(304)
   })
 
+  it('should support etag when If-Modified-Since is included', async () => {
+    const response = await fetchViaHTTP(appPort, '/api/blog')
+    const etag = response.headers.get('etag')
+
+    const unmodifiedResponse = await fetchViaHTTP(appPort, '/api/blog', null, {
+      headers: {
+        'If-None-Match': etag,
+        'If-Modified-Since': 'Wed, 21 Oct 2015 07:28:00 GMT',
+      },
+    })
+
+    expect(unmodifiedResponse.status).toBe(304)
+  })
+
   it('should parse urlencoded body', async () => {
     const body = {
       title: 'Nextjs',

@@ -86,7 +86,21 @@ export function sendEtagResponse(
     res.setHeader('ETag', etag)
   }
 
-  if (fresh(req.headers, { etag })) {
+  /**
+   * `fresh` will check for `If-None-Match`, `Cache-Control`, and
+   * `If-Modified-Since` headers. However we're only handling ETags here
+   * and if the `If-Modified-Since` header is present but the `Last-Modified`
+   * header is not `fresh` will return `false`.
+   */
+  if (
+    fresh(
+      {
+        'if-none-match': req.headers['if-none-match'],
+        'cache-control': req.headers['cache-control'],
+      },
+      { etag }
+    )
+  ) {
     res.statusCode = 304
     res.end()
     return true
