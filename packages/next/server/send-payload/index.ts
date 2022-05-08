@@ -86,7 +86,12 @@ export function sendEtagResponse(
     res.setHeader('ETag', etag)
   }
 
-  if (fresh(req.headers, { etag })) {
+  if (
+    fresh(req.headers, {
+      etag,
+      'last-modified': res.getHeader('last-modified'),
+    })
+  ) {
     res.statusCode = 304
     res.end()
     return true

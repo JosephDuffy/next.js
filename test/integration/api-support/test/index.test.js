@@ -248,6 +248,17 @@ function runTests(dev = false) {
     expect(unmodifiedResponse.status).toBe(304)
   })
 
+  it('should support last-modified', async () => {
+    const response = await fetchViaHTTP(appPort, '/api/blog')
+    const lastModified = response.headers.get('Last-Modified')
+
+    const unmodifiedResponse = await fetchViaHTTP(appPort, '/api/blog', null, {
+      headers: { 'If-Modified-Since': lastModified },
+    })
+
+    expect(unmodifiedResponse.status).toBe(304)
+  })
+
   it('should parse urlencoded body', async () => {
     const body = {
       title: 'Nextjs',
